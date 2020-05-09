@@ -22,7 +22,7 @@ def set_initialisation(optimisation_model, set_class):
 
     optimisation_model.d = pyo.Set(initialize = set_class.d,
                          doc = 'destinations', ordered = True)
-
+    
     optimisation_model.l = pyo.Set(initialize = set_class.L,
                          doc = 'Locomotive type', ordered = True)
 
