@@ -8,19 +8,6 @@ def variable_initialisation(optimisation_model):
     # get the set of time period as a list
     hsetlist = list(optimisation_model.h)
 
-    def QCfx(optimisation_model, l, i, j, t):
-        """
-        This function fix the QC value of any customer/region pairs
-        that is not feasible to zero
-        """
-        if optimisation_model.HC[h, c] != 1:
-            optimisation_model.QC[c, g, h, t].fixed = True
-            return 0
-
-        else:
-            return None
-
-
     optimisation_model.x = pyo.Var(
                             optimisation_model.l, optimisation_model.i,
                             optimisation_model.j, optimisation_model.t,
