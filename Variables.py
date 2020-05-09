@@ -2,8 +2,8 @@ import pyomo.environ as pyo
 
 def variable_initialisation(optimisation_model):
     """
-    This function takes in the optimisation_model as the input and initialise
-    the variables, their characteristics and bounds
+    This function takes in the optimisation_model as the input and
+    initialises the variables, their characteristics and bounds
     """
     # get the set of time period as a list
     hsetlist = list(optimisation_model.h)
