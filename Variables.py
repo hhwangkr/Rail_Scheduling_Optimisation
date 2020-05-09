@@ -5,9 +5,7 @@ def variable_initialisation(optimisation_model):
     This function takes in the optimisation_model as the input and
     initialises the variables, their characteristics and bounds
     """
-    # get the set of time period as a list
-    hsetlist = list(optimisation_model.h)
-
+    
     optimisation_model.x = pyo.Var(
                             optimisation_model.l, optimisation_model.i,
                             optimisation_model.j, optimisation_model.t,
