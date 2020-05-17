@@ -123,47 +123,121 @@ def constraint_definition(model):
         This constraint ensures all container deliveries are made in time
         """
         return \
-        sum (model.WS[w, i, t] for w in model.w) <= model.NW[i]
+        model.S[c, g, o, d, t] <= sum (model.CS[c, g, o, d, i, t+model.tau[g, o, d]] for i in model.i if i == d)
+    
+     def transportation_constraint(model, i, j, t):
+        """
+        This constraint restricts the maximum number of wagons on each service to WMAX
+        """
+        return \
+        sum (model.x[l, i, j, t] * model.WMAX for l in model.l) >= sum (model.WM[w, i, j, t] for w in model.w)
 
-
-
+     def wagon_mix_1(model, i, j, t):
+        """
+        This constraint defines the mix of wagon types constituting each service(1)
+        """
+        return \
+        model.WM[60, i, j, t] + model.WM[40, i, j, t] >= \
+        sum (model.CM[40, g, o, d, i, j, t] for g in model.g for o in model.o for d in model.d)
+    
+     def wagon_mix_2(model, i, j, t):
+        """
+        This constraint defines the mix of wagon types constituting each service(2)
+        """
+        return \
+        3 * model.WM[60, i, j, t] \
+        - 2 * sum (model.CM[40, g, o, d, i, j, t] for g in model.g for o in model.o for d in model.d) >= \
+        sum (model.CM[20, g, o, d, i, j, t] for g in model.g for o in model.o for d in model.d)   
+    
+     def min_prep_time(model, i, t):
+        """
+        This constraint ensures that the services are spaced apart for at least 1 time period
+        
+        [not sure how this should be written in Pyomo...]
+        """
+ 
+    
     model.objective_function = pyo.Objective(
                                rule = objective_rule,
-                               sense = pyo.maximize, doc = 'maximise revenue'
+                               sense = pyo.minimize, doc = 'minimize cost'
                                )
 
-
     model.constraint1 = pyo.Constraint(
-                        model.g, model.j, model.t, rule = constraint_rule_1,
-                        doc = 'refer to constraint_rule_1'
+                        model.l, model.i, model.t, rule = locomotive_balance,
+                        doc = 'refer to locomotive_balance description'
                         )
 
     model.constraint2 = pyo.Constraint(
-                        model.g, model.j, model.t, rule = constraint_rule_2,
-                        doc = 'refer to constraint_rule_2'
+                        model.w, model.i, model.t, rule = wagon_balance,
+                        doc = 'refer to wagon_balance description'
                         )
 
     model.constraint3 = pyo.Constraint(
-                        model.j, model.t, rule = constraint_rule_3,
-                        doc = 'refer to constraint_rule_3'
+                        model.c, model.i, model.t, rule = container_balance,
+                        doc = 'refer to container_balance description'
                         )
 
     model.constraint4 = pyo.Constraint(
-                        model.m, model.t, rule = constraint_rule_4,
-                        doc = 'refer to constraint_rule_4'
+                        model.l, model.i, rule = close_the_loop_1,
+                        doc = 'refer to close_the_loop_1 description'
                         )
 
     model.constraint5 = pyo.Constraint(
-                        model.g, model.h, model.t, rule = constraint_rule_5,
-                        doc = 'refer to constraint_rule_5'
+                        model.w, model.i, rule = close_the_loop_2,
+                        doc = 'refer to close_the_loop_2 description'
                         )
 
     model.constraint6 = pyo.Constraint(
-                        model.g, model.c, model.t, rule = constraint_rule_6,
-                        doc = 'refer to constraint_rule_6'
+                        model.w, model.t, rule = operational_limit_1,
+                        doc = 'refer to operational_limit_1 description'
                         )
 
     model.constraint7 = pyo.Constraint(
-                        model.i, model.t, rule = constraint_rule_7,
-                        doc = 'refer to constraint_rule_7'
+                        model.l, model.t, rule = operational_limit_2,
+                        doc = 'refer to operational_limit_2 description'
+                        )
+
+    model.constraint8 = pyo.Constraint(
+                        model.i, model.t, rule = service_limit,
+                        doc = 'refer to service_limit description'
+                        )
+    
+    model.constraint9 = pyo.Constraint(
+                        model.i, model.t, rule = storage_limit_1,
+                        doc = 'refer to storage_limit_1 description'
+                        )
+    
+    model.constraint10 = pyo.Constraint(
+                        model.i, model.t, rule = storage_limit_2,
+                        doc = 'refer to storage_limit_2 description'
+                        )
+    
+    model.constraint11 = pyo.Constraint(
+                        model.i, model.t, rule = storage_limit_3,
+                        doc = 'refer to storage_limit_3 description'
+                        )
+    
+    model.constraint12 = pyo.Constraint(
+                        model.c, model.g, model.o, model.d, rule = demand_tracking,
+                        doc = 'refer to demand_tracking description'
+                        )
+    
+    model.constraint13 = pyo.Constraint(
+                        model.i, model.j, model.t, rule = transportation_constraint,
+                        doc = 'refer to transportation_constraint description'
+                        )
+    
+    model.constraint14 = pyo.Constraint(
+                        model.i, model.j, model.t, rule = wagon_mix_1,
+                        doc = 'refer to wagon_mix_1 description'
+                        )
+    
+    model.constraint15 = pyo.Constraint(
+                        model.i, model.j, model.t, rule = wagon_mix_2,
+                        doc = 'refer to wagon_mix_2 description'
+                        )
+    
+    model.constraint16 = pyo.Constraint(
+                        model.i, model.t, rule = min_prep_time,
+                        doc = 'refer to min_prep_time description'
                         )
