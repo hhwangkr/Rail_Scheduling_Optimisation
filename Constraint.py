@@ -5,7 +5,7 @@ def constraint_definition(model):
     This function takes in the model object and initialise
     user-defined constraints
     """
-    hsetlist = list(model.h)
+    tsetlist = list(model.t)
 
     def objective_rule(model):
         """
@@ -20,9 +20,22 @@ def constraint_definition(model):
         """
         This constraint defines the loco balance around a given node i.
         'ix' refers to i' from formulation
-        
-        [does the balance require initial level parameter for t0?]
         """
+        if t = 1
+        return \
+        model.M[l, i, t] = 2 + 3 + 4
+        
+        elseif t = model.r[i]
+        return \
+        model.M[l, i, t] = model.M[l, i, t-1] + 1 + 2
+    
+        elseif t = model.u[i] + model.H[ix,i]
+        return \
+        model.M[l, i, t] = model.M[l, i, t-1] \
+                           - sum (model.x[l, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
+                           + 3
+    
+        else
         return \
         model.M[l, i, t] = model.M[l, i, t-1] \
                            - sum (model.x[l, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
@@ -52,7 +65,6 @@ def constraint_definition(model):
         sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
         = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
         + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.S[c, g, o, i, t] for o in model.o) \
         - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o) \
         + sum (model.CM[c, g, o, ix, i, t-model.u[i]-model.H[ix,i]] for ix in model.i if ix != i for g in model.g for o in model.o)
 
@@ -63,8 +75,9 @@ def constraint_definition(model):
         
         [how do you relate t == t0 and t == tf in the constraint?]
         """
+        if t1 = tsetlist[0] and t2 = tsetlist[-1]
         return \
-        model.M[l, i, t0] = model.M[l, i, tf]
+        model.M[l, i, t1] = model.M[l, i, t2]
 
     def close_the_loop_2(model, w, i):
         """
@@ -73,8 +86,9 @@ def constraint_definition(model):
         
         [how do you relate t == t0 and t == tf in the constraint?]
         """
+        if t1 = tsetlist[0] and t2 = tsetlist[-1]
         return \
-        model.WS[w, i, t0] = model.WS[w, i, tf]
+        model.WS[w, i, t1] = model.WS[w, i, t2]
 
     def operational_limit_1(model, w, t):
         """
@@ -92,18 +106,6 @@ def constraint_definition(model):
         sum (model.x[l, i, j, t] for i in model.i for j in model.j) \
         + sum (model.M[l, i, t] for i in model.i) \
         = model.OL[l]
-
-    def operational_limit_3(model, c, g, o):
-        """
-        This constraint ensures the total number of containers in the network does not exceed the total accumulated container supply
-        at time t.
-        
-        [Is this how you would accumulate the parameter values over time?]
-        """
-        return \
-        sum (model.WS[c, g, o, i, t] for i in model.i for t in model.t if t <= t) \
-        + sum (model.WM[c, g, o, i, j, t] for i in model.i for j in model.j for t in model.t if t <= t) \
-        = sum (model.S[c, g, o, d, t] for d in model.d for t in model t if t <= t)
     
     def service_limit(model, i, t):
         """
@@ -152,26 +154,24 @@ def constraint_definition(model):
         This constraint defines the mix of wagon types constituting each service(1)
         """
         return \
-        model.WM[60, i, j, t] + model.WM[40, i, j, t] >= \
-        sum (model.CM[40, g, o, i, j, t] for g in model.g for o in model.o)
+        model.WM["60", i, j, t] + model.WM["40", i, j, t] >= \
+        sum (model.CM["40", g, o, i, j, t] for g in model.g for o in model.o)
     
      def wagon_mix_2(model, i, j, t):
         """
         This constraint defines the mix of wagon types constituting each service(2)
         """
         return \
-        3 * model.WM[60, i, j, t] \
-        - 2 * sum (model.CM[40, g, o, i, j, t] for g in model.g for o in model.o) >= \
-        sum (model.CM[20, g, o, i, j, t] for g in model.g for o in model.o)   
+        3 * model.WM["60", i, j, t] \
+        - 2 * sum (model.CM["40", g, o, i, j, t] for g in model.g for o in model.o) >= \
+        sum (model.CM["20", g, o, i, j, t] for g in model.g for o in model.o)   
     
-     def min_prep_time(model, i):
+     def min_prep_time(model, i, t):
         """
         This constraint ensures that the services are spaced apart for at least 1 time period
-        
-        [Not sure if this is a correct way to define this constraint...]
         """
         return \
-        sum (model.x[l, i, j, t] for l in model.l for j in model.j for t in model.t if t >= t-model.P[i]) \
+        sum (model.x[l, i, j, tp] for l in model.l for j in model.j for tp in model.t if tp >= t - model.P[i]) \
         <= 1
     
     model.objective_function = pyo.Objective(
@@ -213,53 +213,48 @@ def constraint_definition(model):
                         model.l, model.t, rule = operational_limit_2,
                         doc = 'refer to operational_limit_2 description'
                         )
-    
-    model.constraint8 = pyo.Constraint(
-                        model.l, model.t, rule = operational_limit_3,
-                        doc = 'refer to operational_limit_3 description'
-                        )
 
-    model.constraint9 = pyo.Constraint(
+    model.constraint8 = pyo.Constraint(
                         model.i, model.t, rule = service_limit,
                         doc = 'refer to service_limit description'
                         )
     
-    model.constraint10 = pyo.Constraint(
+    model.constraint9 = pyo.Constraint(
                         model.i, model.t, rule = storage_limit_1,
                         doc = 'refer to storage_limit_1 description'
                         )
     
-    model.constraint11 = pyo.Constraint(
+    model.constraint10 = pyo.Constraint(
                         model.i, model.t, rule = storage_limit_2,
                         doc = 'refer to storage_limit_2 description'
                         )
     
-    model.constraint12 = pyo.Constraint(
+    model.constraint11 = pyo.Constraint(
                         model.i, model.t, rule = storage_limit_3,
                         doc = 'refer to storage_limit_3 description'
                         )
     
-    model.constraint13 = pyo.Constraint(
+    model.constraint12 = pyo.Constraint(
                         model.c, model.g, model.o, model.d, rule = demand_tracking,
                         doc = 'refer to demand_tracking description'
                         )
     
-    model.constraint14 = pyo.Constraint(
+    model.constraint13 = pyo.Constraint(
                         model.i, model.j, model.t, rule = transportation_constraint,
                         doc = 'refer to transportation_constraint description'
                         )
     
-    model.constraint15 = pyo.Constraint(
+    model.constraint14 = pyo.Constraint(
                         model.i, model.j, model.t, rule = wagon_mix_1,
                         doc = 'refer to wagon_mix_1 description'
                         )
     
-    model.constraint16 = pyo.Constraint(
+    model.constraint15 = pyo.Constraint(
                         model.i, model.j, model.t, rule = wagon_mix_2,
                         doc = 'refer to wagon_mix_2 description'
                         )
     
-    model.constraint17 = pyo.Constraint(
+    model.constraint16 = pyo.Constraint(
                         model.i, model.t, rule = min_prep_time,
                         doc = 'refer to min_prep_time description'
                         )
