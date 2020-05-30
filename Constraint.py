@@ -21,19 +21,23 @@ def constraint_definition(model):
         This constraint defines the loco balance around a given node i.
         'ix' refers to i' from formulation
         """
-        if t = 1
+        if t <= 1
         return \
-        model.M[l, i, t] = 2 + 3 + 4
+        model.M[l, i, t] = model.M_in[l, i] \
+                           - sum(model.x_init[l, i, ix] for ix in model.i if ix != i) \
+                           + sum(model.x_init[l, ix, i] for ix in model.i if ix != i)
         
-        elseif t = model.r[i]
+        elseif t <= model.r[i]
         return \
-        model.M[l, i, t] = model.M[l, i, t-1] + 1 + 2
+        model.M[l, i, t] = model.M[l, i, t-1] \
+                           - sum(model.x_init[l, i, ix] for ix in model.i if ix != i) \
+                           + sum(model.x_init[l, ix, i] for ix in model.i if ix != i)
     
-        elseif t = model.u[i] + model.H[ix,i]
+        elseif t <= model.u[i] + model.H[ix,i]
         return \
         model.M[l, i, t] = model.M[l, i, t-1] \
                            - sum (model.x[l, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
-                           + 3
+                           + sum (model.x_init[l, ix, i] for ix in model.i if ix != i)
     
         else
         return \
@@ -46,21 +50,61 @@ def constraint_definition(model):
         """
         This constraint defines the wagon balance around a given node i.
         'ix' refers to i' from formulation
-        
-        [does the balance require initial level parameter for t0?]
         """
+        if t <= 1
+        return \
+        model.WS[w, i, t] = model.WS_init[w, i] \
+                           - sum (model.WM_init[w, i, ix] for ix in model.i if ix != i) \
+                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+    
+        elseif t <= model.r[i]
+        return \
+        model.WS[w, i, t] = model.WS[w, i, t-1] \
+                           - sum (model.WM_init[w, i, ix] for ix in model.i if ix != i) \
+                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+    
+        elseif t <= model.u[i] + model.H[ix,i]
         return \
         model.WS[w, i, t] = model.WS[w, i, t-1] \
                            - sum (model.WM[w, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
-                           + sum (model.WS[w, ix, i, t-model.u[i]-model.H[ix,i]] for ix in model.i if ix != i)
+                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+    
+        else
+        return \
+        model.WS[w, i, t] = model.WS[w, i, t-1] \
+                           - sum (model.WM[w, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
+                           + sum (model.WM[w, ix, i, t-model.u[i]-model.H[ix,i]] for ix in model.i if ix != i)
 
     def container_balance(model, c, i, t):
         """
         This constraint defines the container balance around a given node i.
         'ix' refers to i' from formulation
-        
-        [does the balance require initial level parameter for t0?]
         """
+        if t <= 1
+        return \
+        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
+        = sum (model.CS_init[c, g, o, i] for g in model.g for o in model.o) \
+        + sum (model.S[c, g, i, d, t] for d in model.d) \
+        - sum (model.CM_init[c, g, o, i, ix] for ix in model.i if ix != i for g in model.g for o in model.o) \
+        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)
+    
+        elseif t <= model.r[i]
+        return \
+        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
+        = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
+        + sum (model.S[c, g, i, d, t] for d in model.d) \
+        - sum (model.CM_init[c, g, o, i, ix] for ix in model.i if ix != i for g in model.g for o in model.o) \
+        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)
+
+        elseif t <= model.u[i] + model.H[ix,i]
+        return \
+        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
+        = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
+        + sum (model.S[c, g, i, d, t] for d in model.d) \
+        - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o) \
+        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)        
+    
+        else
         return \
         sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
         = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
