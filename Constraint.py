@@ -72,29 +72,29 @@ def constraint_definition(model):
         """
         if t <= 1
         return \
-        sum (model.CS[c, g, d, i, t] for g in model.g for o in model.o) \
+        sum (model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
         = sum (model.S[c, g, i, d, t] for d in model.d)
     
         elseif t <= model.r[i]
         return \
-        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
-        = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
+        sum (model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
+        = sum (model.CS[c, g, d, i, t-1] for g in model.g for d in model.d) \
         + sum (model.S[c, g, i, d, t] for d in model.d)
 
         elseif t <= model.u[i] + model.H[ix,i]
         return \
-        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
-        = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
+        sum (model.CS[c, g, d, i, t] for g in model.g for o in model.d) \
+        = sum (model.CS[c, g, d, i, t-1] for g in model.g for o in model.d) \
         + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o)       
+        - sum (model.CM[c, g, d, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for d in model.d)       
     
         else
         return \
-        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
-        = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
+        sum (model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
+        = sum (model.CS[c, g, d, i, t-1] for g in model.g for d in model.d) \
         + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o) \
-        + sum (model.CM[c, g, o, ix, i, t-model.u[i]-model.H[ix,i]] for ix in model.i if ix != i for g in model.g for o in model.o)
+        - sum (model.CM[c, g, d, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for d in model.d) \
+        + sum (model.CM[c, g, d, ix, i, t-model.u[i]-model.H[ix,i]] for ix in model.i if ix != i for g in model.g for d in model.d)
 
     def close_the_loop_1(model, l, i):
         """
@@ -147,7 +147,7 @@ def constraint_definition(model):
         This constraint ensures each node only holds containers up to its storage limit
         """
         return \
-        sum (model.CS[c, g, o, i, t] for c in model.c for g in model.g for o in model.o) <= model.NC[i]
+        sum (model.CS[c, g, d, i, t] for c in model.c for g in model.g for d in model.d) <= model.NC[i]
 
     def storage_limit_2(model, i, t):
         """
@@ -163,12 +163,14 @@ def constraint_definition(model):
         return \
         sum (model.WS[w, i, t] for w in model.w) <= model.NW[i]
 
-    def demand_tracking(model, c, g, o, d):
+    def demand_tracking(model, c, g, d):
         """
         This constraint ensures all container deliveries are made in time
+        
+        [RHS = if i == d?]
         """
         return \
-        model.S[c, g, o, d, t] <= sum (model.CS[c, g, o, i, t+model.tau[g, o, d]] for i in model.i if i == d)
+        sum (model.S[c, g, i, d, t] for i in model.i for t in model.t) = sum (model.CS[c, g, d, i, t] for i in model.i for t in model.t)
     
      def transportation_constraint(model, i, j, t):
         """
@@ -183,7 +185,7 @@ def constraint_definition(model):
         """
         return \
         model.WM["60", i, j, t] + model.WM["40", i, j, t] >= \
-        sum (model.CM["40", g, o, i, j, t] for g in model.g for o in model.o)
+        sum (model.CM["40", g, d, i, j, t] for g in model.g for d in model.d)
     
      def wagon_mix_2(model, i, j, t):
         """
@@ -191,8 +193,8 @@ def constraint_definition(model):
         """
         return \
         3 * model.WM["60", i, j, t] \
-        - 2 * sum (model.CM["40", g, o, i, j, t] for g in model.g for o in model.o) >= \
-        sum (model.CM["20", g, o, i, j, t] for g in model.g for o in model.o)   
+        - 2 * sum (model.CM["40", g, d, i, j, t] for g in model.g for d in model.d) >= \
+        sum (model.CM["20", g, d, i, j, t] for g in model.g for d in model.d)   
     
      def min_prep_time(model, i, t):
         """
@@ -263,7 +265,7 @@ def constraint_definition(model):
                         )
     
     model.constraint12 = pyo.Constraint(
-                        model.c, model.g, model.o, model.d, rule = demand_tracking,
+                        model.c, model.g, model.d, rule = demand_tracking,
                         doc = 'refer to demand_tracking description'
                         )
     
