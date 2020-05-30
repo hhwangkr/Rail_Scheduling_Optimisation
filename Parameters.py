@@ -91,3 +91,25 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                             optimisation_model.i,
                             initialize = fixed_par_input.NW,
                             doc = 'storage capacity (wagon) at node i')
+    
+    optimisation_model.M_init = pyo.Param(
+                                optimisation_model.l, optimisation_model.l,
+                                initialize = var_par_input.M_init,
+                                doc = 'initial # locomotives (of type l) stationed at i')
+    
+    optimisation_model.x_init = pyo.Param(
+                                optimisation_model.l, optimisation_model.i,
+                                optimisation_model.j,
+                                initialize = var_par_input.x_init,
+                                doc = 'initial flag of locomotive (of type l) leaving i for j')
+
+    optimisation_model.WS_init = pyo.Param(
+                                 optimisation_model.w, optimisation_model.i,
+                                 initialize = fixed_par_input.WS_init,
+                                 doc = 'initial # wagons (of type l) stationed at i')
+    
+    optimisation_model.WM_init = pyo.Param(
+                                 optimisation_model.w, optimisation_model.i,
+                                 optimisation_model.j,
+                                 initialize = fixed_par_input.WM_init,
+                                 doc = 'initial # wagons (of type w) leaving i for j')
