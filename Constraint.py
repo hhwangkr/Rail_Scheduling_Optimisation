@@ -23,21 +23,16 @@ def constraint_definition(model):
         """
         if t <= 1
         return \
-        model.M[l, i, t] = model.M_in[l, i] \
-                           - sum(model.x_init[l, i, ix] for ix in model.i if ix != i) \
-                           + sum(model.x_init[l, ix, i] for ix in model.i if ix != i)
+        model.M[l, i, t] = model.M_init[l, i]
         
         elseif t <= model.r[i]
         return \
-        model.M[l, i, t] = model.M[l, i, t-1] \
-                           - sum(model.x_init[l, i, ix] for ix in model.i if ix != i) \
-                           + sum(model.x_init[l, ix, i] for ix in model.i if ix != i)
+        model.M[l, i, t] = model.M[l, i, t-1]
     
         elseif t <= model.u[i] + model.H[ix,i]
         return \
         model.M[l, i, t] = model.M[l, i, t-1] \
-                           - sum (model.x[l, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
-                           + sum (model.x_init[l, ix, i] for ix in model.i if ix != i)
+                           - sum (model.x[l, i, ix, t-model.r[i]] for ix in model.i if ix != i)
     
         else
         return \
@@ -53,21 +48,16 @@ def constraint_definition(model):
         """
         if t <= 1
         return \
-        model.WS[w, i, t] = model.WS_init[w, i] \
-                           - sum (model.WM_init[w, i, ix] for ix in model.i if ix != i) \
-                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+        model.WS[w, i, t] = model.WS_init[w, i]
     
         elseif t <= model.r[i]
         return \
-        model.WS[w, i, t] = model.WS[w, i, t-1] \
-                           - sum (model.WM_init[w, i, ix] for ix in model.i if ix != i) \
-                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+        model.WS[w, i, t] = model.WS[w, i, t-1]
     
         elseif t <= model.u[i] + model.H[ix,i]
         return \
         model.WS[w, i, t] = model.WS[w, i, t-1] \
-                           - sum (model.WM[w, i, ix, t-model.r[i]] for ix in model.i if ix != i) \
-                           + sum (model.WM_init[w, ix, i] for ix in model.i if ix != i)
+                           - sum (model.WM[w, i, ix, t-model.r[i]] for ix in model.i if ix != i)
     
         else
         return \
@@ -82,27 +72,21 @@ def constraint_definition(model):
         """
         if t <= 1
         return \
-        sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
-        = sum (model.CS_init[c, g, o, i] for g in model.g for o in model.o) \
-        + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.CM_init[c, g, o, i, ix] for ix in model.i if ix != i for g in model.g for o in model.o) \
-        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)
+        sum (model.CS[c, g, d, i, t] for g in model.g for o in model.o) \
+        = sum (model.S[c, g, i, d, t] for d in model.d)
     
         elseif t <= model.r[i]
         return \
         sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
         = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
-        + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.CM_init[c, g, o, i, ix] for ix in model.i if ix != i for g in model.g for o in model.o) \
-        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)
+        + sum (model.S[c, g, i, d, t] for d in model.d)
 
         elseif t <= model.u[i] + model.H[ix,i]
         return \
         sum (model.CS[c, g, o, i, t] for g in model.g for o in model.o) \
         = sum (model.CS[c, g, o, i, t-1] for g in model.g for o in model.o) \
         + sum (model.S[c, g, i, d, t] for d in model.d) \
-        - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o) \
-        + sum (model.CM_init[c, g, o, ix, i] for ix in model.i if ix != i for g in model.g for o in model.o)        
+        - sum (model.CM[c, g, o, i, ix, t-model.r[i]] for ix in model.i if ix != i for g in model.g for o in model.o)       
     
         else
         return \
