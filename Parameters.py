@@ -71,10 +71,10 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
 
     optimisation_model.S = pyo.Param(
                            optimisation_model.c, optimisation_model.g,
-                           optimisation_model.o, optimisation_model.d,
+                           optimisation_model.i, optimisation_model.d,
                            optimisation_model.t,
                             initialize = fixed_par_input.S,
-                            doc = 'supply of containers (of type c) at time t for customer g at node o for destination d'
+                            doc = 'supply of containers (of type c) at time t for customer g at node i for destination d'
                             )
 
     optimisation_model.NC = pyo.Param(
@@ -97,19 +97,7 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                                 initialize = var_par_input.M_init,
                                 doc = 'initial # locomotives (of type l) stationed at i')
     
-    optimisation_model.x_init = pyo.Param(
-                                optimisation_model.l, optimisation_model.i,
-                                optimisation_model.j,
-                                initialize = var_par_input.x_init,
-                                doc = 'initial flag of locomotive (of type l) leaving i for j')
-
     optimisation_model.WS_init = pyo.Param(
                                  optimisation_model.w, optimisation_model.i,
                                  initialize = fixed_par_input.WS_init,
                                  doc = 'initial # wagons (of type l) stationed at i')
-    
-    optimisation_model.WM_init = pyo.Param(
-                                 optimisation_model.w, optimisation_model.i,
-                                 optimisation_model.j,
-                                 initialize = fixed_par_input.WM_init,
-                                 doc = 'initial # wagons (of type w) leaving i for j')
