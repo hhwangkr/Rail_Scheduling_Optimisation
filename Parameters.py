@@ -101,6 +101,6 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
     
     optimisation_model.WS_init = pyo.Param(
                                  optimisation_model.w, optimisation_model.i,
-                                 initialize = fixed_par_input.WS_init,
+                                 initialize = var_par_input.WS_init,
                                  doc = 'initial # wagons (of type l) stationed at i'
                                  )
