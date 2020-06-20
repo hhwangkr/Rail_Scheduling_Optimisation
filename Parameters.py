@@ -71,7 +71,7 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                            optimisation_model.c, optimisation_model.g,
                            optimisation_model.i, optimisation_model.d,
                            optimisation_model.t,
-                           initialize = fixed_par_input.S,
+                           initialize = var_par_input.S,
                            doc = 'supply of containers (of type c) at time t for customer g at node i for destination d'
                            )
 
