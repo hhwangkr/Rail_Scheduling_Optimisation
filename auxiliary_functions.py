@@ -11,49 +11,44 @@ class SetInput():
     """
     This is an object that initialise the input sets
     """
-    def __init__(self, i, j, g, t, m, c, h):
+    def __init__(self, g, i, j, o, d, l, c, w, t):
+        self.g = g
         self.i = i
         self.j = j
-        self.g = g
-        self.t = t
-        self.m = m
+        self.o = o
+        self.d = d
+        self.l = l
         self.c = c
-        self.h = h
+        self.w = w
+        self.t = t
 
 class ParaFixedInput():
     """
     This is an object that initialise the fixed parameters
     """
-    def __init__(self, p_min, p_max, PR, tao, miu, n, LT, IC_low, IH_low,
-    IC_upper, HC):
-        self.p_min = p_min
-        self.p_max = p_max
-        self.PR = PR
-        self.tao = tao
-        self.miu = miu
-        self.n = n
-        self.LT = LT
-        self.IC_low = IC_low
-        self.IH_low = IH_low
-        self.IC_upper = IC_upper
-        self.HC = HC
+    def __init__(self, tau, r, u, H, OL, OW, NC, NL, NW):
+        self.tau = tau
+        self.r = r
+        self.u = u
+        self.H = H
+        self.OL = OL
+        self.OW = OW
+        self.NC = NC
+        self.NL = NL
+        self.NW = NW
 
 class ParaVarInput():
     """
     This is an object that initialise the varying parameters
     """
-    def __init__(self, f, phi, D, SP, SO, PC, OC, OP,
-    IC_ini_level, S_ini_level):
-        self.f = f
-        self.phi = phi
-        self.D = D
-        self.SP = SP
-        self.SO = SO
-        self.PC = PC
-        self.OC = OC
-        self.OP = OP
-        self.IC_ini_level = IC_ini_level
-        self.S_ini_level = S_ini_level
+    def __init__(self, FC, VC, P, WMAX, S, M_init, WS_init):
+        self.FC = FC
+        self.VC = VC
+        self.P = P
+        self.WMAX = WMAX
+        self.S = S
+        self.M_init = M_init
+        self.WS_init = WS_init
 
 def result_data_load(optimisation_model, var_list):
     """
