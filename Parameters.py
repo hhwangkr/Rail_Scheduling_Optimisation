@@ -62,8 +62,6 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                            doc = 'preparation time required between consecutive services at node i'
                            )
 
-
-
     optimisation_model.WMAX = pyo.Param(
                               initialize = var_par_input.WMAX,
                               doc = 'max. # wagons per service'
@@ -73,31 +71,36 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                            optimisation_model.c, optimisation_model.g,
                            optimisation_model.i, optimisation_model.d,
                            optimisation_model.t,
-                            initialize = fixed_par_input.S,
-                            doc = 'supply of containers (of type c) at time t for customer g at node i for destination d'
-                            )
+                           initialize = fixed_par_input.S,
+                           doc = 'supply of containers (of type c) at time t for customer g at node i for destination d'
+                           )
 
     optimisation_model.NC = pyo.Param(
                             optimisation_model.i,
                             initialize = fixed_par_input.NC,
-                            doc = 'storage capacity (container) at node i')
+                            doc = 'storage capacity (container) at node i'
+                            )
  
     optimisation_model.NL = pyo.Param(
                             optimisation_model.i,
                             initialize = fixed_par_input.NL,
-                            doc = 'storage capacity (locomotive) at node i')
+                            doc = 'storage capacity (locomotive) at node i'
+                            )
 
     optimisation_model.NW = pyo.Param(
                             optimisation_model.i,
                             initialize = fixed_par_input.NW,
-                            doc = 'storage capacity (wagon) at node i')
+                            doc = 'storage capacity (wagon) at node i'
+                            )
     
     optimisation_model.M_init = pyo.Param(
                                 optimisation_model.l, optimisation_model.l,
                                 initialize = var_par_input.M_init,
-                                doc = 'initial # locomotives (of type l) stationed at i')
+                                doc = 'initial # locomotives (of type l) stationed at i'
+                                )
     
     optimisation_model.WS_init = pyo.Param(
                                  optimisation_model.w, optimisation_model.i,
                                  initialize = fixed_par_input.WS_init,
-                                 doc = 'initial # wagons (of type l) stationed at i')
+                                 doc = 'initial # wagons (of type l) stationed at i'
+                                 )
