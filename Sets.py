@@ -8,7 +8,7 @@ def set_initialisation(optimisation_model, set_class):
     and initialise the set for the model
     """
     # set of monomer production plants
-    optimisation_model.g = pyo.Set(initialize = set_class.G,
+    optimisation_model.g = pyo.Set(initialize = set_class.g,
                          doc = 'customers', ordered = True)
     
     optimisation_model.i = pyo.Set(initialize = set_class.i,
@@ -23,14 +23,14 @@ def set_initialisation(optimisation_model, set_class):
     optimisation_model.d = pyo.Set(initialize = set_class.d,
                          doc = 'destinations', ordered = True)
     
-    optimisation_model.l = pyo.Set(initialize = set_class.L,
+    optimisation_model.l = pyo.Set(initialize = set_class.l,
                          doc = 'Locomotive type', ordered = True)
 
-    optimisation_model.c = pyo.Set(initialize = set_class.C,
+    optimisation_model.c = pyo.Set(initialize = set_class.c,
                          doc = 'Container type', ordered = True)
 
-    optimisation_model.w = pyo.Set(initialize = set_class.W,
+    optimisation_model.w = pyo.Set(initialize = set_class.w,
                          doc = 'Wagon type', ordered = True)
 
-    optimisation_model.t = pyo.Set(initialize = set_class.T,
+    optimisation_model.t = pyo.Set(initialize = set_class.t,
                          doc = 'time periods', ordered = True)    
