@@ -8,7 +8,7 @@ def set_initialisation(optimisation_model, set_class):
     and initialise the set for the model
     """
     # set of monomer production plants
-    optimisation_model.G = pyo.Set(initialize = set_class.G,
+    optimisation_model.g = pyo.Set(initialize = set_class.G,
                          doc = 'customers', ordered = True)
     
     optimisation_model.i = pyo.Set(initialize = set_class.i,
