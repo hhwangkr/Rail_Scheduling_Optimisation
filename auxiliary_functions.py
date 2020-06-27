@@ -50,6 +50,14 @@ class ParaVarInput():
         self.M_init = M_init
         self.WS_init = WS_init
 
+def cell_loc_conversion(user_input_loc):
+    """
+    This function takes in the excel cell number (x, A) where x is the
+    row number and A is the column letter and convert it into a loc
+    tuple which python can read
+    """
+    return user_input_loc[0] - 1, ord(user_input_loc[1].lower()) - 97
+        
 def result_data_load(optimisation_model, var_list):
     """
     This function takes the model and the list of variables
@@ -71,9 +79,11 @@ def read_par_from_excel(file_name, sheet_name, start_loc, end_loc, par_dim):
     """
     start_loc = cell_loc_conversion(start_loc)
     end_loc = cell_loc_conversion(end_loc)
+    
     if par_dim == (0, 1):
 
         for sheet in xlrd.open_workbook(file_name).sheets():
+            
             if sheet.name == sheet_name:
                 dic_keys = [
                 sheet.cell(start_loc[0], col).value
@@ -145,12 +155,3 @@ def read_set_from_excel(file_name, sheet_name, start_loc, end_loc):
             ]
 
     return set_list
-
-
-def cell_loc_conversion(user_input_loc):
-    """
-    This function takes in the excel cell number (x, A) where x is the
-    row number and A is the column letter and convert it into a loc
-    tuple which python can read
-    """
-    return user_input_loc[0] - 1, ord(user_input_loc[1].lower()) - 97
