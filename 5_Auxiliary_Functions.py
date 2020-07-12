@@ -28,8 +28,6 @@ class ParaFixedInput():
     """
     def __init__(self, tau, r, u, H, OL, OW, NC, NL, NW):
         self.tau = tau
-        self.r = r
-        self.u = u
         self.H = H
         self.OL = OL
         self.OW = OW
