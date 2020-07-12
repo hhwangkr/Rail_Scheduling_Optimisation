@@ -12,18 +12,6 @@ def parameter_initialisation(optimisation_model, fixed_par_input):
                              doc = 'Max. time allowable for delivery of containers from o to d for customer g'
                              )
 
-    optimisation_model.r = pyo.Param(
-                           optimisation_model.i,
-                           initialize = fixed_par_input.r,
-                           doc = 'loading time at node i'
-                           )
-
-    optimisation_model.u = pyo.Param(
-                           optimisation_model.i,
-                           initialize = fixed_par_input.u,
-                           doc = 'unloading time at i'
-                           )
-
     optimisation_model.H = pyo.Param(
                            optimisation_model.i, optimisation_model.j,
                            initialize = fixed_par_input.H,
