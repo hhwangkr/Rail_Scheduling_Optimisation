@@ -7,7 +7,7 @@ def set_initialisation(optimisation_model, set_class):
     This function takes in the model object and the set input (set_class)
     and initialise the set for the model
     """
-    # set of monomer production plants
+    
     optimisation_model.g = pyo.Set(initialize = set_class.g,
                          doc = 'customers', ordered = True)
     
