@@ -69,11 +69,29 @@ def result_data_load(optimisation_model, var_list):
             result_data[i][k] = var_obj[k].value
     return result_data
 
+def read_set_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
+    """
+    This function takes in the excel and the sheet_name + the location
+    of the set to be retrieved and returns the dictionary that can be 
+    used for the optimisation model
+    """
+    start_loc = cell_loc_conversion(start_loc)
+    end_loc = cell_loc_conversion(end_loc)
+    
+    for sheet in xlrd.open_workbook(file_name).sheets():
+        if sheet.name == sheet_name:
+            set_list = [
+            sheet.cell(row, start_loc[1]).value
+            for row in range(start_loc[0] + 1, end_loc[0] + 1)
+            ]
+
+    return set_list            
+            
 def read_par_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
     """
     This function takes in the excel and the sheet_name + the location
     of the parameter to be retrieved and the paramter dimention
-    and return the dictionary that can be used for the optimisation model
+    and returns the dictionary that can be used for the optimisation model
     """
     start_loc = cell_loc_conversion(start_loc)
     end_loc = cell_loc_conversion(end_loc)
