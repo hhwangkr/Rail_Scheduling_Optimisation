@@ -7,8 +7,8 @@ from pyomo.opt import SolverStatus, TerminationCondition
 import Sets as fset
 import Parameters as fpar
 import Variables as fvar
-import constraint_definition as fcon
-import auxiliary_function as faux
+import Constraints as fcon
+import Auxiliary_Functions as faux
 
 
 def data_construction(file_name):
