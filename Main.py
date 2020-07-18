@@ -4,9 +4,9 @@ from pyomo.environ import *
 from pyomo.opt import SolverStatus, TerminationCondition
 
 ## Import model components ##
-import set_definition as fset
-import parameter_definition as fpar
-import variable_definition as fvar
+import Sets as fset
+import Parameters as fpar
+import Variables as fvar
 import constraint_definition as fcon
 import auxiliary_function as faux
 
