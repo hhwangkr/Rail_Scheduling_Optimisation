@@ -1,6 +1,6 @@
 import pyomo.environ as pyo
 
-def parameter_initialisation(optimisation_model, fixed_par_input):
+def parameter_initialisation(optimisation_model, fixed_par_input, var_par_input):
     """
     This function takes the model input (optimisation_model) and the
     parameter input objects to initialise the model's parameters
