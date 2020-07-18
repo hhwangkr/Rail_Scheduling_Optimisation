@@ -67,9 +67,6 @@ def data_construction(file_name):
 
     return set_input, fixed_var, variable_par
 
-
-
-
 def main():
     """
     This is the main function which calls all other functions to solve the
@@ -81,54 +78,27 @@ def main():
     # get the data input as objects
     Excel_file = 'Pyomo_RSO_Parameter_Input.xlsx'
     set_input, fixed_par, variable_par = data_construction(Excel_file)
-    #print(fixed_par.IH_low)
-    #print(variable_par.SP)
+
     # set initialisation
-    fset.set_initialisation(PSE_model, set_input)
+    fset.set_initialisation(RSO_model, set_input)
 
     # parameter initialisation
-    fpar.parameter_initialisation(PSE_model, fixed_par, variable_par)
+    fpar.parameter_initialisation(RSO_model, fixed_par, variable_par)
 
     # variable initialisation
-    fvar.variable_initialisation(PSE_model)
+    fvar.variable_initialisation(RSO_model)
 
     # constraint initialisation
-    fcon.constraint_definition(PSE_model)
+    fcon.constraint_definition(RSO_model)
 
     # set up the model
     opt = SolverFactory('cplex')
-    #opt.options['mipgap'] = 0.001
-    #opt.options['threads'] = 0
 
-    results = opt.solve(PSE_model, tee = True,
-    symbolic_solver_labels = True)
+    results = opt.solve(RSO_model, tee = True, symbolic_solver_labels = True)
 
-    PSE_model.solutions.store_to(results)
+    RSO_model.solutions.store_to(results)
+    
     results.write(filename = 'solution.yml')
 
-    # for m in PSE_model.m:
-    #     for t in PSE_model.t:
-    print(sum (PSE_model.QC[c, g, h, t].value * PSE_model.SP[c, g, t]
-    for g in PSE_model.g for c in PSE_model.c
-    for h in PSE_model.h for t in PSE_model.t))
-    print(sum(PSE_model.S[m, t].value * PSE_model.SO[m, t]
-        for m in PSE_model.m
-        for t in PSE_model.t))
-
-    print(sum (PSE_model.QC[c, g, h, t].value
-    for g in PSE_model.g for c in PSE_model.c
-    for h in PSE_model.h for t in PSE_model.t))
-
-    print(sum(PSE_model.tao[g, j]
-                for g in PSE_model.g for j in PSE_model.j))
-    #total_Psale = PSE_model.QC#['KSC (UAE)', 'gPE1', 'UAE', '3'].value
-    # total_Psale = sum (
-    # PSE_model.QC[c, g, h, t].value * PSE_model.SP[c, g, t].value \
-    # for g in PSE_model.g for c in PSE_model.c
-    # for h in PSE_model.h for t in PSE_model.t)
-    #print(total_Psale)
-    # result_dict = faux.result_data_load(PSE_model, ['PP'])
-    # print(result_dict)
 if __name__ == '__main__':
     main()
-© 2020 GitHub, Inc.
