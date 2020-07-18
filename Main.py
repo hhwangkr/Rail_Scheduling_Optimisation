@@ -16,48 +16,29 @@ def data_construction(file_name):
     This function constructs the input data object
     """
     # load the sets
-    i = faux.read_set_from_excel(file_name, 'set', (3, 'E'), (3, 'J'))
-    j = faux.read_set_from_excel(file_name, 'set', (6, 'E'), (6, 'O'))
-    t = faux.read_set_from_excel(file_name, 'set', (9, 'E'), (9, 'J'))
-    h = faux.read_set_from_excel(file_name, 'set', (12, 'E'), (3, 'G'))
-    c = faux.read_set_from_excel(file_name, 'set', (15, 'E'), (15, 'J'))
-    g = faux.read_set_from_excel(file_name, 'set', (18, 'E'), (18, 'N'))
-    m = faux.read_set_from_excel(file_name, 'set', (21, 'E'), (21, 'L'))
+    g = ['Maersk']
+    i = ['A', 'B', 'C', 'D']
+    j = ['A', 'B', 'C', 'D']
+    o = ['A']
+    d = ['D']
+    l = ['Diesel', 'Electric']
+    c = ['20ft', '40ft']
+    w = ['40ft', '60ft']
+    t = [n for n in range(0,49)]
 
-    set_input = faux.SetInput(i, j, g, t, m, c, h)
+    set_input = faux.SetInput(g, i, j, o, d, l, c, w, t)
 
-    # load the parameters for the production of olefins
-    p_min = faux.read_par_from_excel(file_name,
-                'ProductionOlefins', (5, 'C'), (6, 'H'), (0, 1))
+    # load single-dimension parameters of set 'i'
+    P = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_i', (2, 'A'), (6, 'B'), 1)
+    NC = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_i', (2, 'A'), (6, 'C'), 1)
+    NL = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_i', (2, 'A'), (6, 'D'), 1)
+    NW = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_i', (2, 'A'), (6, 'E'), 1)
 
-    p_max = faux.read_par_from_excel(file_name,
-                'ProductionOlefins', (10, 'C'), (11, 'H'), (0, 1))
+    # load asset ownership information
+    OL = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_OL', (2, 'A'), (4, 'B'), 1)
+    OW = faux.read_par_from_excel('Pyomo_RSO_Parameter_Input.xlsx','1DPar_OW', (2, 'A'), (4, 'B'), 1)
 
-    OC = faux.read_par_from_excel(file_name,
-                'ProductionOlefins', (15, 'C'), (16, 'H'), (0, 1))
-
-    miu = faux.read_par_from_excel(file_name,
-                'ProductionOlefins', (22, 'C'), (70, 'L'), (2, 1))
-
-    IC_upper = faux.read_par_from_excel(file_name,
-                'ProductionOlefins', (74, 'C'), (75, 'J'), (0, 1))
-
-
-    # load the parameters for the production of polyolefins
-    PR = faux.read_par_from_excel(file_name,
-                'ProductionPolyolefins', (4, 'D'), (14, 'O'), (1, 1))
-
-    tao = faux.read_par_from_excel(file_name,
-                'ProductionPolyolefins', (18, 'D'), (28, 'O'), (1, 1))
-
-    n = faux.read_par_from_excel(file_name,
-                'ProductionPolyolefins', (32, 'D'), (37, 'N'), (1, 1))
-
-    OP = faux.read_par_from_excel(file_name,
-                'ProductionPolyolefins', (47, 'D'), (57, 'O'), (1, 1))
-
-
-    # Load the parameters for the warehouse shipping
+    # load journey time of feasible legs
     LT = faux.read_par_from_excel(file_name,
                 'WarehousesShipping', (5, 'C'), (6, 'E'), (0, 1))
 
