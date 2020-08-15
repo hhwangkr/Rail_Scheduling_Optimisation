@@ -1,8 +1,3 @@
-###############################################
-# This documents contains all the auxiliary ###
-# functions and classes being used in the #####
-# model. ######################################
-
 # Import nccessary packages
 import xlrd
 
@@ -11,6 +6,7 @@ class SetInput():
     """
     This is an object that initialise the input sets
     """
+
     def __init__(self, g, i, j, o, d, l, c, w, t):
         self.g = g
         self.i = i
@@ -22,11 +18,14 @@ class SetInput():
         self.w = w
         self.t = t
 
+
 class ParaFixedInput():
     """
     This is an object that initialise the fixed parameters
     """
-    def __init__(self, tau, r, u, H, OL, OW, NC, NL, NW):
+
+    def __init__(self, FR, tau, H, OL, OW, NC, NL, NW):
+        self.FR = FR
         self.tau = tau
         self.H = H
         self.OL = OL
@@ -35,10 +34,12 @@ class ParaFixedInput():
         self.NL = NL
         self.NW = NW
 
+
 class ParaVarInput():
     """
     This is an object that initialise the varying parameters
     """
+
     def __init__(self, FC, VC, P, WMAX, S, M_init, WS_init):
         self.FC = FC
         self.VC = VC
@@ -48,6 +49,7 @@ class ParaVarInput():
         self.M_init = M_init
         self.WS_init = WS_init
 
+
 def cell_loc_conversion(user_input_loc):
     """
     This function takes in the excel cell number (x, A) where x is the
@@ -55,7 +57,8 @@ def cell_loc_conversion(user_input_loc):
     tuple which python can read
     """
     return user_input_loc[0] - 1, ord(user_input_loc[1].lower()) - 97
-        
+
+
 def result_data_load(optimisation_model, var_list):
     """
     This function takes the model and the list of variables
@@ -69,6 +72,7 @@ def result_data_load(optimisation_model, var_list):
             result_data[i][k] = var_obj[k].value
     return result_data
 
+
 def read_set_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
     """
     This function takes in the excel and the sheet_name + the location
@@ -77,16 +81,14 @@ def read_set_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
     """
     start_loc = cell_loc_conversion(start_loc)
     end_loc = cell_loc_conversion(end_loc)
-    
+
     for sheet in xlrd.open_workbook(file_name).sheets():
         if sheet.name == sheet_name:
-            set_list = [
-            sheet.cell(row, start_loc[1]).value
-            for row in range(start_loc[0] + 1, end_loc[0] + 1)
-            ]
+            set_list = [sheet.cell(row, start_loc[1]).value for row in range(start_loc[0] + 1, end_loc[0] + 1)]
 
-    return set_list            
-            
+    return set_list
+
+
 def read_par_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
     """
     This function takes in the excel and the sheet_name + the location
@@ -100,81 +102,82 @@ def read_par_from_excel(file_name, sheet_name, start_loc, end_loc, n_set):
         for sheet in xlrd.open_workbook(file_name).sheets():
             if sheet.name == sheet_name:
                 dic_keys = [
-                sheet.cell(row, start_loc[1]).value
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, start_loc[1]).value
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
                 dic_values = [
-                sheet.cell(row, end_loc[1]).value
-                if sheet.cell_type(row, col) != xlrd.XL_CELL_EMPTY else 0
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, end_loc[1]).value
+                    if sheet.cell_type(row, end_loc[1]) != xlrd.XL_CELL_EMPTY else 0
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
-                
+
     elif n_set == 2:
         for sheet in xlrd.open_workbook(file_name).sheets():
             if sheet.name == sheet_name:
                 dic_keys = [
-                (sheet.cell(row, start_loc[1]).value,
-                sheet.cell(row, start_loc[1] + 1).value)
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    (sheet.cell(row, start_loc[1]).value,
+                     sheet.cell(row, start_loc[1] + 1).value)
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
                 dic_values = [
-                sheet.cell(row, end_loc[1]).value
-                if sheet.cell_type(row, col) != xlrd.XL_CELL_EMPTY else 0
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, end_loc[1]).value
+                    if sheet.cell_type(row, end_loc[1]) != xlrd.XL_CELL_EMPTY else 0
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
-    
+
     elif n_set == 3:
         for sheet in xlrd.open_workbook(file_name).sheets():
             if sheet.name == sheet_name:
                 dic_keys = [
-                (sheet.cell(row, start_loc[1]).value,
-                sheet.cell(row, start_loc[1] + 1).value,
-                sheet.cell(row, start_loc[1] + 2).value)
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    (sheet.cell(row, start_loc[1]).value,
+                     sheet.cell(row, start_loc[1] + 1).value,
+                     sheet.cell(row, start_loc[1] + 2).value)
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
                 dic_values = [
-                sheet.cell(row, end_loc[1]).value
-                if sheet.cell_type(row, col) != xlrd.XL_CELL_EMPTY else 0
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, end_loc[1]).value
+                    if sheet.cell_type(row, end_loc[1]) != xlrd.XL_CELL_EMPTY else 0
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
     elif n_set == 4:
         for sheet in xlrd.open_workbook(file_name).sheets():
             if sheet.name == sheet_name:
                 dic_keys = [
-                (sheet.cell(row, start_loc[1]).value,
-                sheet.cell(row, start_loc[1] + 1).value,
-                sheet.cell(row, start_loc[1] + 2).value,
-                sheet.cell(row, start_loc[1] + 3).value)
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    (sheet.cell(row, start_loc[1]).value,
+                     sheet.cell(row, start_loc[1] + 1).value,
+                     sheet.cell(row, start_loc[1] + 2).value,
+                     sheet.cell(row, start_loc[1] + 3).value)
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
                 dic_values = [
-                sheet.cell(row, end_loc[1]).value
-                if sheet.cell_type(row, col) != xlrd.XL_CELL_EMPTY else 0
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, end_loc[1]).value
+                    if sheet.cell_type(row, end_loc[1]) != xlrd.XL_CELL_EMPTY else 0
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
     elif n_set == 5:
         for sheet in xlrd.open_workbook(file_name).sheets():
             if sheet.name == sheet_name:
                 dic_keys = [
-                (sheet.cell(row, start_loc[1]).value,
-                sheet.cell(row, start_loc[1] + 1).value,
-                sheet.cell(row, start_loc[1] + 2).value,
-                sheet.cell(row, start_loc[1] + 3).value,
-                sheet.cell(row, start_loc[1] + 4).value)
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    (sheet.cell(row, start_loc[1]).value,
+                     sheet.cell(row, start_loc[1] + 1).value,
+                     sheet.cell(row, start_loc[1] + 2).value,
+                     sheet.cell(row, start_loc[1] + 3).value,
+                     sheet.cell(row, start_loc[1] + 4).value)
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
 
                 dic_values = [
-                sheet.cell(row, end_loc[1]).value
-                if sheet.cell_type(row, col) != xlrd.XL_CELL_EMPTY else 0
-                for row in range(start_loc[0] + 1, end_loc[0] + 1)
+                    sheet.cell(row, end_loc[1]).value
+                    if sheet.cell_type(row, end_loc[1]) != xlrd.XL_CELL_EMPTY else 0
+                    for row in range(start_loc[0] + 1, end_loc[0] + 1)
                 ]
-                
+
     par_dict = dict(zip(dic_keys, dic_values))
     return par_dict
+

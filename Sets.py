@@ -1,7 +1,6 @@
 # from pyomo.environ import *
 import pyomo.environ as pyo
 
-
 def set_initialisation(optimisation_model, set_class):
     """
     This function takes in the model object and the set input (set_class)
