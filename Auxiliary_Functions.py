@@ -6,7 +6,6 @@ class SetInput():
     """
     This is an object that initialise the input sets
     """
-
     def __init__(self, g, i, j, o, d, l, c, w, t):
         self.g = g
         self.i = i
@@ -19,12 +18,11 @@ class SetInput():
         self.t = t
 
 
-class ParaFixedInput():
+class ParamInput():
     """
     This is an object that initialise the fixed parameters
     """
-
-    def __init__(self, FR, tau, H, OL, OW, NC, NL, NW):
+    def __init__(self, FR, tau, H, OL, OW, NC, NL, NW, FC, VC, P, WMAX, S, M_init, WS_init):
         self.FR = FR
         self.tau = tau
         self.H = H
@@ -33,14 +31,6 @@ class ParaFixedInput():
         self.NC = NC
         self.NL = NL
         self.NW = NW
-
-
-class ParaVarInput():
-    """
-    This is an object that initialise the varying parameters
-    """
-
-    def __init__(self, FC, VC, P, WMAX, S, M_init, WS_init):
         self.FC = FC
         self.VC = VC
         self.P = P

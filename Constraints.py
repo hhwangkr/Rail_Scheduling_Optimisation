@@ -2,8 +2,7 @@ import pyomo.environ as pyo
 
 def constraint_definition(model):
     """
-    This function takes in the model object and initialise
-    user-defined constraints
+    This function takes in the model object and initialise user-defined constraints
     """
     tsetlist = list(model.t)
 
@@ -12,116 +11,95 @@ def constraint_definition(model):
         This constraint defines the objective function
         """
         return \
-            sum(model.VC[w, i, j] * model.WM[w, i, j, t] * model.FR[i, j] for t in model.t for w in model.w for i in model.i for j in
-                model.j if model.FR[i,j] == 1) \
-            + sum(model.FC[l, i, j] * model.x[l, i, j, t] * model.FR[i, j] for t in model.t for l in model.l for i in model.i for j in
-                  model.j if model.FR[i,j] == 1)
+            sum(model.VC[w, i, j] * model.WM[w, i, j, t] for t in model.t for w in model.w for i in model.i for j in model.j if model.FR[i, j] == 1) \
+            + sum(model.FC[l, i, j] * model.x[l, i, j, t] for t in model.t for l in model.l for i in model.i for j in model.j if model.FR[i, j] == 1)
 
     def locomotive_balance(model, l, i, t):
         """
-        This constraint defines the loco balance around a given node i.
-        ix refers to i' from formulation
+        This constraint defines the loco balance around each node i
         """
-        if t <= 1:
-            return model.M[l, i, t] == model.M_init[l, i]
-
-        elif t <= next(model.H[j, i] * model.FR[i, j] for j in model.j if model.FR[i,j] == 1):
-            return \
-                model.M[l, i, t] == model.M[l, i, t - 1] \
-                - sum(model.x[l, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1)
+        if t == 0:
+            return model.M[l, i, t] == model.M_init[l, i] \
+                - sum(model.x[l, i, j, t] * model.FR[i, j] for j in model.j) \
 
         else:
             return \
-                model.M[l, i, t] == model.M[l, i, t - 1] \
-                - sum(model.x[l, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1) \
-                + sum(model.x[l, j, i, t - model.H[j, i]] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1)
+                model.M[l, i, t] == model.M[l, i, t-1] \
+                - sum(model.x[l, i, j, t] * model.FR[i, j] for j in model.j) \
+                + sum(model.x[l, j, i, t-model.H[j, i]] * model.FR[j, i] for j in model.j if t >= model.H[j, i])
 
     def wagon_balance(model, w, i, t):
         """
-        This constraint defines the wagon balance around a given node i.
-        ix refers to i' from formulation
+        This constraint defines the wagon balance around each node i
         """
-        if t <= 1:
-            return model.WS[w, i, t] == model.WS_init[w, i]
-
-        elif t <= next(model.H[j, i] * model.FR[i, j] for j in model.j if model.FR[i,j] == 1):
-            return \
-                model.WS[w, i, t] == model.WS[w, i, t - 1] \
-                - sum(model.WM[w, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1)
+        if t == 0:
+            return model.WS[w, i, t] == model.WS_init[w, i] \
+                   - sum(model.WM[w, i, j, t] * model.FR[i, j] for j in model.j)
 
         else:
             return \
-                model.WS[w, i, t] == model.WS[w, i, t - 1] \
-                - sum(model.WM[w, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1) \
-                + sum(model.WM[w, j, i, t - model.H[j, i]] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1)
+                model.WS[w, i, t] == model.WS[w, i, t-1] \
+                - sum(model.WM[w, i, j, t] * model.FR[i, j] for j in model.j) \
+                + sum(model.WM[w, j, i, t-model.H[j, i]] * model.FR[j, i] for j in model.j if t >= model.H[j, i])
 
-    def container_balance(model, c, i, t):
+    def container_balance(model, c, g, d, i, t):
         """
-        This constraint defines the container balance around a given node i.
-        ix refers to i' from formulation
+        This constraint defines the container balance around each node i
         """
-        if t <= 1:
+        if t == 0:
             return \
-                sum(model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
-                == sum(model.S[c, g, i, d, t] for i in model.o for g in model.g for d in model.d)
-
-        elif t <= next(model.H[j, i] * model.FR[i, j] for j in model.j if model.FR[i,j] == 1):
-            return \
-                sum(model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
-                == sum(model.CS[c, g, d, i, t - 1] for g in model.g for d in model.d) \
-                + sum(model.S[c, g, i, d, t] for i in model.o for g in model.g for d in model.d) \
-                - sum(model.CM[c, g, d, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1 for g in model.g for d in model.d)
+                model.CS[c, g, d, i, t] \
+                == model.S[c, g, d, i, t] \
+                - sum(model.CM[c, g, d, i, j, t] * model.FR[i, j]for j in model.j)
 
         else:
             return \
-                sum(model.CS[c, g, d, i, t] for g in model.g for d in model.d) \
-                == sum(model.CS[c, g, d, i, t - 1] for g in model.g for d in model.d) \
-                + sum(model.S[c, g, i, d, t] for i in model.o for g in model.g for d in model.d) \
-                - sum(model.CM[c, g, d, i, j, t] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1 for g in model.g for d in model.d) \
-                + sum(model.CM[c, g, d, j, i, t - model.H[j, i]] * model.FR[i, j] for j in model.j if model.FR[i, j] == 1 for g in model.g for d in model.d)
+                model.CS[c, g, d, i, t] \
+                == model.CS[c, g, d, i, t-1] \
+                + model.S[c, g, d, i, t] \
+                - sum(model.CM[c, g, d, i, j, t] * model.FR[i, j] for j in model.j) \
+                + sum(model.CM[c, g, d, j, i, t-model.H[j, i]] * model.FR[j, i]for j in model.j if t >= model.H[j, i]) \
 
     def close_the_loop_1(model, l, i):
         """
         This constraint ensures all locos are at their original locations upon completion of a delivery cycle.
         Distribution does not have to be accurate at ID level; as long as locos are of same class, it is operationally okay.
         """
-        t1 = tsetlist[0]
-        t2 = tsetlist[-1]
-        return model.M[l, i, t1] == model.M[l, i, t2]
+        tf = tsetlist[-1]
+        return model.M_init[l, i] == model.M[l, i, tf]
 
     def close_the_loop_2(model, w, i):
         """
         This constraint ensures all wagons are at their original locations upon completion of a delivery cycle.
         Distribution does not have to be accurate at ID level; as long as wagons are of same class, it is operationally okay.
         """
-        t1 = tsetlist[0]
-        t2 = tsetlist[-1]
-        return model.WS[w, i, t1] == model.WS[w, i, t2]
+        tf = tsetlist[-1]
+        return model.WS_init[w, i] == model.WS[w, i, tf]
 
     def operational_limit_1(model, w, t):
         """
         This constraint ensures the total number of wagons in the network does not exceed the number of wagons owned at all times.
         """
+        t1 = tsetlist[0]
         return \
-            sum(model.WM[w, i, j, t] for i in model.i for j in model.j) \
-            + sum(model.WS[w, i, t] for i in model.i) \
-            == model.OW[w]
+            sum(model.WM[w, i, j, t] * model.FR[i, j] for i in model.i for j in model.j) + sum(model.WS[w, i, t] for i in model.i) \
+            <= sum(model.WM[w, i, j, t1] * model.FR[i, j] for i in model.i for j in model.j) + sum(model.WS[w, i, t1] for i in model.i)
 
     def operational_limit_2(model, l, t):
         """
         This constraint ensures the total number of locos in the network does not exceed the number of locos owned at all times.
         """
+        t1 = tsetlist[0]
         return \
-            sum(model.x[l, i, j, t] for i in model.i for j in model.j) \
-            + sum(model.M[l, i, t] for i in model.i) \
-            == model.OL[l]
+            sum(model.x[l, i, j, t] * model.FR[i, j] for i in model.i for j in model.j) + sum(model.M[l, i, t] for i in model.i) \
+            <= sum(model.x[l, i, j, t1] * model.FR[i, j] for i in model.i for j in model.j) + sum(model.M[l, i, t1] for i in model.i)
 
     def service_limit(model, i, t):
         """
         This constraint ensures no more than one train is leaving each node at time t
         """
         return \
-            sum(model.x[l, i, j, t] for l in model.l for j in model.j) <= 1
+            sum(model.x[l, i, j, t] * model.FR[i, j] for l in model.l for j in model.j) <= 1
 
     def storage_limit_1(model, i, t):
         """
@@ -150,23 +128,26 @@ def constraint_definition(model):
         """
         tf = tsetlist[-1]
         return \
-            sum(model.S[c, g, i, d, t] for i in model.o for t in model.t) \
-            == sum(model.CS[c, g, d, i, t] for i in model.i if i == d for t in model.t)
+            sum(model.S[c, g, d, i, t] for i in model.o for t in model.t) <= sum(model.CS[c, g, d, i, tf] for i in model.i if i == d)
 
     def transportation_constraint(model, i, j, t):
         """
         This constraint restricts the maximum number of wagons on each service to WMAX
         """
-        return \
-            sum(model.x[l, i, j, t] for l in model.l) * model.WMAX >= sum(model.WM[w, i, j, t] for w in model.w)
+        if model.FR[i, j] == 1:
+            return \
+                sum(model.x[l, i, j, t] for l in model.l) * model.WMAX >= sum(model.WM[w, i, j, t] for w in model.w)
+        else:
+            return pyo.Constraint.Skip
 
     def wagon_mix_1(model, i, j, t):
         """
         This constraint defines the mix of wagon types constituting each service (1)
         """
-        if model.FR[i,j] == 1:
+        if model.FR[i, j] == 1:
             return \
-                model.WM["60ft", i, j, t] + model.WM["40ft", i, j, t] \
+                model.WM["60ft", i, j, t] \
+                + model.WM["40ft", i, j, t] \
                 >= sum(model.CM["40ft", g, d, i, j, t] for g in model.g for d in model.d)
         else:
             return pyo.Constraint.Skip
@@ -184,14 +165,14 @@ def constraint_definition(model):
         else:
             return pyo.Constraint.Skip
 
-    def min_prep_time(model, i, t):
-        """
-        This constraint ensures that the services are spaced apart for at least 1 time period
-        """
-        tp = t
-        return \
-            sum(model.x[l, i, j, tp] for l in model.l for j in model.j for tp in model.t if tp >= t - model.P[i]) \
-            <= 1
+    # def min_prep_time(model, i, t):
+    #     """
+    #     This constraint ensures that the services are spaced apart for at least 1 time period
+    #     """
+    #     tp = t
+    #     return \
+    #         sum(model.x[l, i, j, tp] for l in model.l for j in model.j for tp in model.t if tp >= t - model.P[i]) \
+    #         <= 1
 
     model.objective_function = pyo.Objective(
         rule=objective_rule,
@@ -209,7 +190,7 @@ def constraint_definition(model):
     )
 
     model.constraint3 = pyo.Constraint(
-        model.c, model.i, model.t, rule=container_balance,
+        model.c, model.g, model.d, model.i, model.t, rule=container_balance,
         doc='refer to container_balance description'
     )
 
@@ -273,7 +254,7 @@ def constraint_definition(model):
         doc='refer to wagon_mix_2 description'
     )
 
-    model.constraint16 = pyo.Constraint(
-        model.i, model.t, rule=min_prep_time,
-        doc='refer to min_prep_time description'
-    )
+    # model.constraint16 = pyo.Constraint(
+    #     model.i, model.t, rule=min_prep_time,
+    #     doc='refer to min_prep_time description'
+    # )
