@@ -10,6 +10,7 @@ import Variables as fvar
 import Constraints as fcon
 import Auxiliary_Functions as faux
 
+#Meaningful change...
 
 def data_construction(file_name):
     """
@@ -62,17 +63,45 @@ def data_construction(file_name):
     tau = faux.read_par_from_excel(file_name, '3DPar_Tau', (2, 'A'), (4, 'D'), 3)
 
     # Load Delivery time information
-    S = faux.read_par_from_excel(file_name, '5DPar_S', (2, 'A'), (198, 'F'), 5)
+    S = faux.read_par_from_excel(file_name, '5DPar_S', (2, 'A'), (5, 'F'), 5)
 
     param_input = faux.ParamInput(FR, tau, H, OL, OW, NC, NL, NW, FC, VC, P, WMAX, S, M_init, WS_init)
 
     return set_input, param_input
 
+class Variable:
+    def __init__(self, model, var, index): #Initialisation
+        self.model = model
+        self.var = var
+        self.index = index
+
+    def index_name(self):
+        return self.index
+
+    def index_list(self):
+        list = []
+        for v in self.model.component_objects(Var):
+            if v.name == self.var:
+                for i in v:
+                    list.append(i)
+        return list
+
+    def value_list(self):
+        list = []
+        for v in self.model.component_objects(Var):
+            if v.name == self.var:
+                for i in v:
+                    list.append(v[i].value)
+        return list
+
+    def var_dataframe(self):
+        df = pd.DataFrame(self.value_list(), index=self.index_list(), columns=['Value'])
+        df['Value'] = df['Value'].fillna(0)
+        return df
 
 def main():
     """
-    This is the main function which calls all other functions to solve the
-    optimisation model
+    This is the main function which calls all other functions to solve the optimisation model
     """
     # initialise the concreteModel
     RSO_model = ConcreteModel()
@@ -96,11 +125,12 @@ def main():
     # set up the model
     opt = SolverFactory('cbc', executable="cbc-win64\cbc")
 
-    results = opt.solve(RSO_model, tee=True, symbolic_solver_labels=True, timelimit=10)
+    results = opt.solve(RSO_model, tee=True, symbolic_solver_labels=True, timelimit=60)
 
     RSO_model.solutions.store_to(results)
 
-    results.write(filename='solution.yml')
+    indexname = Variable(RSO_model, 'M', ['c', 'g', 'd', 'i', 't']).index_name()
+    print(indexname)
 
     # tidy up variable results
     var_dict = {}
@@ -113,15 +143,12 @@ def main():
 
     # feasible routes dataframe
     list_FR = [key for key, val in param_input.FR.items() if val != 0]
-    df_FR = pd.DataFrame(list_FR,
-                         columns=['i', 'j'])
+    df_FR = pd.DataFrame(list_FR, columns=['i', 'j'])
 
     # journey time dataframe
     list_H = {key:val for key, val in param_input.H.items() if val != 0}
-    df_H = pd.DataFrame(list_H.items(),
-                        columns=['Leg', 'JourneyTime'])
-    df_H[['i', 'j']] = pd.DataFrame(df_H['Leg'].tolist(),
-                                    index=df_H.index)
+    df_H = pd.DataFrame(list_H.items(), columns=['Leg', 'JourneyTime'])
+    df_H[['i', 'j']] = pd.DataFrame(df_H['Leg'].tolist(), index=df_H.index)
     df_H = df_H[['i', 'j', 'JourneyTime']]
 
     # create dataframe for variable 'x'
@@ -261,7 +288,6 @@ def main():
                                        {'type': 'cell', 'criteria': '=', 'value': 0, 'format': format_others})
 
         writer.save()
-
 
 if __name__ == '__main__':
     main()
